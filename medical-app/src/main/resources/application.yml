@@ -1,0 +1,100 @@
+# =====================================================
+# Application
+# =====================================================
+spring:
+  application:
+    name: medical
+
+  # DeepSeek — AI Model
+  ai:
+    deepseek:
+      api-key: ${DEEPSEEK_API_KEY:your-api-key-here}
+      chat:
+        model: deepseek-chat
+        temperature: 0.7
+        max-tokens: 4096
+
+  # MySQL — Primary Database
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/medical?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&createDatabaseIfNotExist=true
+    username: root
+    password: ${MYSQL_PASSWORD:123456}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  # Flyway — Database Migration
+  flyway:
+    # 数据库名称
+    #schemas: imedical_flyway
+    # flyway自动配置 true 开启
+    enabled: true
+    #设定 SQL 脚本的目录,多个路径使用逗号分隔, 比如取值为 classpath:db/migration,filesystem:/sql-migrations
+    locations:
+      - classpath:db/migration
+    # 如果数据库不是空表，需要设置成 true，否则启动报错
+    baseline-on-migrate: true
+    # 与 baseline-on-migrate: true 搭配使用
+    baseline-version: 0
+    encoding: UTF-8
+    # 开发环境最好开启 outOfOrder, 生产环境关闭 outOfOrder .
+    out-of-order: false
+    # 禁止清理数据库表
+    clean-disabled: true
+    # 校验
+    validate-on-migrate: true
+    # 版本控制日志表，默认flyway_schema_history,不同系统建议修改改数据
+    table: flyway_schema_history
+    #是否替换参数
+    placeholder-replacement: false
+
+  # Redis — Cache & Pub/Sub
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      lettuce:
+        pool:
+          max-active: 16
+          max-idle: 8
+          min-idle: 4
+
+# =====================================================
+# MyBatis-Plus
+# =====================================================
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+
+# =====================================================
+# Agent Configuration
+# =====================================================
+agent:
+  project-root: ${user.dir}
+  max-tool-timeout-seconds: 30
+  max-bash-output-chars: 10240
+  permission:
+    ml-classifier-cache-ttl-minutes: 10
+    confirm-timeout-seconds: 60
+  context:
+    warning-threshold-pct: 70
+    compact-threshold-pct: 85
+    max-messages-load: 50
+  speculation:
+    enabled: true
+    debounce-ms: 500
+    cache-ttl-seconds: 30
+  kairos:
+    heartbeat-interval-ms: 30000
+    idle-dream-threshold-minutes: 5
+
+# =====================================================
+# Server
+# =====================================================
+server:
+  port: 8081
